@@ -1,0 +1,156 @@
+{% extends "seller/base.html" %}
+
+{% block content %}
+<h1 class="h2 mb-4">Seller Dashboard</h1>
+
+<div class="row">
+    <!-- Store Information -->
+    <div class="col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Store Information</h5>
+                <a href="{{ url_for('seller.store_edit') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-edit me-1"></i> Edit
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div class="store-logo mb-3">
+                        {% if store.logo %}
+                        <img src="{{ url_for('static', filename='uploads/' + store.logo) }}" alt="{{ store.name }}" class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                        {% else %}
+                        <div class="store-logo-placeholder bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 100px; height: 100px;">
+                            <i class="fas fa-store fa-3x"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <h4>{{ store.name }}</h4>
+                </div>
+                
+                <p class="store-description">{{ store.description }}</p>
+                
+                <div class="store-stats">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="stat-item p-3">
+                                <h3>{{ product_count }}</h3>
+                                <p class="text-muted mb-0">Products</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-item p-3">
+                                <h3>{{ featured_products|length }}</h3>
+                                <p class="text-muted mb-0">Featured</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-item p-3">
+                                <h3>{{ store.date_created.strftime('%b %Y') }}</h3>
+                                <p class="text-muted mb-0">Since</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <a href="{{ url_for('seller.product_add') }}" class="text-decoration-none">
+                            <div class="quick-action bg-light p-4 rounded text-center">
+                                <i class="fas fa-plus-circle fa-3x text-primary mb-3"></i>
+                                <h5>Add Product</h5>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <a href="{{ url_for('seller.product_list') }}" class="text-decoration-none">
+                            <div class="quick-action bg-light p-4 rounded text-center">
+                                <i class="fas fa-list fa-3x text-success mb-3"></i>
+                                <h5>View Products</h5>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <a href="{{ url_for('seller.store_edit') }}" class="text-decoration-none">
+                            <div class="quick-action bg-light p-4 rounded text-center">
+                                <i class="fas fa-store-alt fa-3x text-info mb-3"></i>
+                                <h5>Edit Store</h5>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <a href="{{ url_for('main.home') }}" target="_blank" class="text-decoration-none">
+                            <div class="quick-action bg-light p-4 rounded text-center">
+                                <i class="fas fa-shopping-cart fa-3x text-warning mb-3"></i>
+                                <h5>Visit Store</h5>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Products -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Recent Products</h5>
+        <a href="{{ url_for('seller.product_list') }}" class="btn btn-sm btn-outline-primary">
+            View All
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Stock</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Date Added</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if recent_products %}
+                    {% for product in recent_products %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="{{ url_for('static', filename='uploads/' + product.image) if product.image else 'https://via.placeholder.com/40' }}" class="rounded me-3" width="40" height="40" alt="{{ product.name }}">
+                                <span>{{ product.name }}</span>
+                            </div>
+                        </td>
+                        <td>${{ "%.2f"|format(product.price) }}</td>
+                        <td>{{ product.stock }}</td>
+                        <td>{{ product.category.name }}</td>
+                        <td>{{ product.date_added.strftime('%b %d, %Y') }}</td>
+                        <td>
+                            <a href="{{ url_for('seller.product_edit', product_id=product.id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-3">No products found</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

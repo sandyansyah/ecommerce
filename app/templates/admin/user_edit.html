@@ -1,0 +1,163 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">Edit User</h1>
+    <a href="{{ url_for('admin.user_list') }}" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-1"></i> Back to User List
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">User Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.user_edit', user_id=user.id) }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name or '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name or '' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="role" class="form-label">Role</label>
+                            <select class="form-select" id="role" name="role">
+                                <option value="customer" {% if user.role.name == 'CUSTOMER' %}selected{% endif %}>Customer</option>
+                                <option value="seller" {% if user.role.name == 'SELLER' %}selected{% endif %}>Seller</option>
+                                <option value="admin" {% if user.role.name == 'ADMIN' %}selected{% endif %}>Administrator</option>
+                            </select>
+                            <div class="form-text">
+                                Changing a user to a Seller will automatically create a store for them if they don't have one.
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="new_password" class="form-label">New Password (Optional)</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Leave blank to keep current password">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {% if user.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">
+                                Active Account
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="text-end">
+                        <a href="{{ url_for('admin.user_list') }}" class="btn btn-outline-secondary me-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- User Stats -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">User Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="avatar-circle bg-primary text-white me-3" style="width: 60px; height: 60px; font-size: 24px;">
+                        {{ user.username[0].upper() }}
+                    </div>
+                    <div>
+                        <h5 class="mb-0">{{ user.username }}</h5>
+                        <p class="text-muted mb-0">{{ user.email }}</p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Registered</span>
+                        <span>{{ user.date_registered.strftime('%b %d, %Y') }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Orders</span>
+                        <span class="badge bg-primary rounded-pill">{{ user.orders|length }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Cart Items</span>
+                        <span class="badge bg-primary rounded-pill">{{ user.cart_items|length }}</span>
+                    </li>
+                    {% if user.role.name == 'SELLER' and user.store %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Store</span>
+                        <span>{{ user.store.name }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Products</span>
+                        <span class="badge bg-primary rounded-pill">{{ user.store.products|length }}</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Recent Orders -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">Recent Orders</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if user.orders %}
+                <div class="list-group list-group-flush">
+                    {% for order in user.orders[:5] %}
+                    <a href="{{ url_for('admin.order_detail', order_id=order.id) }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Order #{{ order.id }}</h6>
+                            <small>{{ order.order_date.strftime('%b %d') }}</small>
+                        </div>
+                        <p class="mb-1">${{ "%.2f"|format(order.total_price) }}</p>
+                        <small>
+                            {% if order.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif order.status == 'paid' %}
+                            <span class="badge bg-success">Paid</span>
+                            {% elif order.status == 'shipped' %}
+                            <span class="badge bg-info">Shipped</span>
+                            {% elif order.status == 'delivered' %}
+                            <span class="badge bg-primary">Delivered</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ order.status }}</span>
+                            {% endif %}
+                        </small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted mb-0">No orders found</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

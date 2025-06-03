@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3 mb-4 mb-lg-0">
+            <div class="card shadow-sm profile-sidebar">
+                <div class="card-body text-center py-5">
+                    <div class="profile-image mb-4">
+                        <div class="profile-avatar rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto" style="width: 100px; height: 100px;">
+                            <span class="text-white fs-1">{{ current_user.username[0].upper() }}</span>
+                        </div>
+                    </div>
+                    <h5 class="mb-1">{{ current_user.username }}</h5>
+                    <p class="text-muted small mb-3">{{ current_user.email }}</p>
+                    <p class="text-muted small mb-0">Member since {{ current_user.date_registered.strftime('%B %Y') }}</p>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{{ url_for('auth.profile') }}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-user me-2"></i> My Profile
+                    </a>
+                    <a href="{{ url_for('orders.order_history') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-shopping-bag me-2"></i> Order History
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="far fa-heart me-2"></i> Wishlist
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="fas fa-bell me-2"></i> Notifications
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="fas fa-cog me-2"></i> Account Settings
+                    </a>
+                    <a href="{{ url_for('auth.logout') }}" class="list-group-item list-group-item-action text-danger">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">My Profile</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('auth.profile') }}">
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ current_user.first_name or '' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" value="{{ current_user.last_name or '' }}">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" value="{{ current_user.email }}" disabled>
+                            <div class="form-text">Your email cannot be changed. This is your login identifier.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" value="{{ current_user.username }}" disabled>
+                            <div class="form-text">Your username cannot be changed.</div>
+                        </div>
+                        
+                        <h5 class="border-bottom pb-2 mb-4 mt-5">Address Information</h5>
+                        
+                        <div class="mb-4">
+                            <label for="address" class="form-label">Street Address</label>
+                            <input type="text" class="form-control" id="address" name="address" value="{{ current_user.address or '' }}">
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="city" class="form-label">City</label>
+                                <input type="text" class="form-control" id="city" name="city" value="{{ current_user.city or '' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="state" class="form-label">State</label>
+                                <input type="text" class="form-control" id="state" name="state" value="{{ current_user.state or '' }}">
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="zip_code" class="form-label">ZIP Code</label>
+                                <input type="text" class="form-control" id="zip_code" name="zip_code" value="{{ current_user.zip_code or '' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" value="{{ current_user.phone or '' }}">
+                            </div>
+                        </div>
+                        
+                        <h5 class="border-bottom pb-2 mb-4 mt-5">Security</h5>
+                        
+                        <div class="mb-4">
+                            <p class="mb-2">Password</p>
+                            <a href="#" class="btn btn-outline-primary">
+                                <i class="fas fa-lock me-2"></i> Change Password
+                            </a>
+                        </div>
+                        
+                        <div class="text-end">
+                            <button type="reset" class="btn btn-outline-secondary me-2">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Recent Orders -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Orders</h5>
+                    <a href="{{ url_for('orders.order_history') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th scope="col" class="py-3 ps-4">Order #</th>
+                                    <th scope="col" class="py-3">Date</th>
+                                    <th scope="col" class="py-3">Total</th>
+                                    <th scope="col" class="py-3">Status</th>
+                                    <th scope="col" class="py-3 text-end pe-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set orders = current_user.orders[:3] %}
+                                {% if orders %}
+                                    {% for order in orders %}
+                                    <tr>
+                                        <td class="py-3 ps-4">#{{ order.id }}</td>
+                                        <td class="py-3">{{ order.order_date.strftime('%b %d, %Y') }}</td>
+                                        <td class="py-3">${{ order.total_price }}</td>
+                                        <td class="py-3">
+                                            {% if order.status == 'pending' %}
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                            {% elif order.status == 'paid' %}
+                                            <span class="badge bg-success">Paid</span>
+                                            {% elif order.status == 'shipped' %}
+                                            <span class="badge bg-info">Shipped</span>
+                                            {% elif order.status == 'delivered' %}
+                                            <span class="badge bg-primary">Delivered</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">{{ order.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="py-3 text-end pe-4">
+                                            <a href="{{ url_for('orders.order_detail', order_id=order.id) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye me-1"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <p class="text-muted mb-0">You haven't placed any orders yet.</p>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

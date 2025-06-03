@@ -1,0 +1,477 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('products.list_products') }}">Products</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('products.category', category_id=product.category_id) }}">{{ product.category.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Product Image -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="product-image-container">
+                        <img src="https://via.placeholder.com/600x600" class="img-fluid" alt="{{ product.name }}">
+                        {% if product.is_featured %}
+                        <span class="badge bg-danger position-absolute top-0 start-0 m-3">Featured</span>
+                        {% endif %}
+                    </div>
+                    <div class="row mt-3 px-2">
+                        <div class="col-3">
+                            <img src="https://via.placeholder.com/150" class="img-thumbnail product-thumbnail" alt="Thumbnail 1">
+                        </div>
+                        <div class="col-3">
+                            <img src="https://via.placeholder.com/150" class="img-thumbnail product-thumbnail" alt="Thumbnail 2">
+                        </div>
+                        <div class="col-3">
+                            <img src="https://via.placeholder.com/150" class="img-thumbnail product-thumbnail" alt="Thumbnail 3">
+                        </div>
+                        <div class="col-3">
+                            <img src="https://via.placeholder.com/150" class="img-thumbnail product-thumbnail" alt="Thumbnail 4">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Product Details -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="mb-3">{{ product.name }}</h1>
+                    
+                    <div class="mb-3 d-flex align-items-center">
+                        <div class="rating me-2">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star-half-alt text-warning"></i>
+                        </div>
+                        <span class="text-muted">(47 reviews)</span>
+                    </div>
+                    
+                    <div class="product-price mb-3">
+                        <span class="fs-3 fw-bold text-primary">${{ product.price }}</span>
+                        {% if product.price < 100 %}
+                        <span class="text-decoration-line-through text-muted ms-2">${{ product.price * 1.2 }}</span>
+                        <span class="badge bg-danger ms-2">20% OFF</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <p class="text-muted">Category: <a href="{{ url_for('products.category', category_id=product.category_id) }}" class="text-decoration-none">{{ product.category.name }}</a></p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>Description</h5>
+                        <p>{{ product.description }}</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>Availability</h5>
+                        {% if product.stock > 0 %}
+                        <p class="text-success"><i class="fas fa-check-circle me-2"></i> In Stock ({{ product.stock }} available)</p>
+                        {% else %}
+                        <p class="text-danger"><i class="fas fa-times-circle me-2"></i> Out of Stock</p>
+                        {% endif %}
+                    </div>
+                    
+                    {% if product.stock > 0 %}
+                    <form action="{{ url_for('cart.add_to_cart', product_id=product.id) }}" method="post" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <label for="quantity" class="form-label">Quantity</label>
+                                <div class="input-group">
+                                    <button type="button" class="btn btn-outline-secondary" id="decrease-qty">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input type="number" class="form-control text-center" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}">
+                                    <button type="button" class="btn btn-outline-secondary" id="increase-qty">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-8">
+                                <label class="form-label d-block">&nbsp;</label>
+                                {% if current_user.is_authenticated %}
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-cart-plus me-2"></i> Add to Cart
+                                </button>
+                                {% else %}
+                                <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-sign-in-alt me-2"></i> Login to Buy
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+                    {% endif %}
+                    
+                    <div class="product-actions">
+                        <button type="button" class="btn btn-outline-primary me-2">
+                            <i class="far fa-heart me-1"></i> Add to Wishlist
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary">
+                            <i class="fas fa-share-alt me-1"></i> Share
+                        </button>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="shipping-info">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-truck text-primary fa-2x me-3"></i>
+                            <div>
+                                <h6 class="mb-0">Free Shipping</h6>
+                                <small class="text-muted">For orders over $50</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-undo text-primary fa-2x me-3"></i>
+                            <div>
+                                <h6 class="mb-0">30-Day Returns</h6>
+                                <small class="text-muted">Hassle-free returns</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-shield-alt text-primary fa-2x me-3"></i>
+                            <div>
+                                <h6 class="mb-0">Secure Payment</h6>
+                                <small class="text-muted">100% secure payment</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Product Tabs -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Description</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="specification-tab" data-bs-toggle="tab" data-bs-target="#specification" type="button" role="tab" aria-controls="specification" aria-selected="false">Specifications</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="false">Reviews (47)</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content p-4" id="productTabsContent">
+                        <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
+                            <h4>Product Description</h4>
+                            <p>{{ product.description }}</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quam velit, vulputate eu pharetra nec, mattis ac neque. Duis vulputate commodo lectus, ac blandit elit tincidunt id. Sed rhoncus, tortor sed eleifend tristique, tortor mauris molestie elit, et lacinia ipsum quam nec dui.</p>
+                            <p>Suspendisse in justo eu magna luctus suscipit. Sed lectus. Integer euismod lacus luctus magna. Quisque cursus, metus vitae pharetra auctor, sem massa mattis sem, at interdum magna augue eget diam.</p>
+                        </div>
+                        <div class="tab-pane fade" id="specification" role="tabpanel" aria-labelledby="specification-tab">
+                            <h4>Product Specifications</h4>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row" class="w-25 bg-light">Brand</th>
+                                            <td>ShopEasy</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="bg-light">Model</th>
+                                            <td>{{ product.name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="bg-light">Category</th>
+                                            <td>{{ product.category.name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="bg-light">Warranty</th>
+                                            <td>1 Year</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="bg-light">Dimensions</th>
+                                            <td>10 x 15 x 5 cm</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="bg-light">Weight</th>
+                                            <td>500g</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+                            <div class="row">
+                                <div class="col-md-4 mb-4">
+                                    <div class="reviews-summary text-center p-4">
+                                        <h2 class="display-4 mb-3">4.5</h2>
+                                        <div class="rating mb-3">
+                                            <i class="fas fa-star text-warning fa-lg"></i>
+                                            <i class="fas fa-star text-warning fa-lg"></i>
+                                            <i class="fas fa-star text-warning fa-lg"></i>
+                                            <i class="fas fa-star text-warning fa-lg"></i>
+                                            <i class="fas fa-star-half-alt text-warning fa-lg"></i>
+                                        </div>
+                                        <p class="text-muted">Based on 47 reviews</p>
+                                        {% if current_user.is_authenticated %}
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                                            <i class="fas fa-pen me-2"></i> Write a Review
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="reviews-list">
+                                        <!-- Sample Review 1 -->
+                                        <div class="review-item card mb-3">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="https://via.placeholder.com/50" class="rounded-circle me-3" alt="User">
+                                                        <div>
+                                                            <h6 class="mb-0">John Doe</h6>
+                                                            <small class="text-muted">Posted on May 15, 2025</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="rating">
+                                                        <i class="fas fa-star text-warning"></i>
+                                                        <i class="fas fa-star text-warning"></i>
+                                                        <i class="fas fa-star text-warning"></i>
+                                                        <i class="fas fa-star text-warning"></i>
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    </div>
+                                                </div>
+                                                <h5 class="review-title">Excellent product!</h5>
+                                                <p class="review-text">This product exceeded my expectations. The quality is excellent and it works perfectly. I would definitely recommend it to anyone looking for a reliable product.</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Sample Review 2 -->
+                                        <div class="review-item card mb-3">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="https://via.placeholder.com/50" class="rounded-circle me-3" alt="User">
+                                                        <div>
+                                                            <h6 class="mb-0">Jane Smith</h6>
+                                                            <small class="text-muted">Posted on May 10, 2025</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="rating">
+                                                        <i class="fas fa-star text-warning"></i>
+                                                        <i class="fas fa-star text-warning"></i>
+                                                        <i class="fas fa-star text-warning"></i>
+                                                        <i class="fas fa-star text-warning"></i>
+                                                        <i class="far fa-star text-warning"></i>
+                                                    </div>
+                                                </div>
+                                                <h5 class="review-title">Good value for money</h5>
+                                                <p class="review-text">I'm quite satisfied with this purchase. The product is well-made and functions as described. The only minor issue is that the delivery took longer than expected.</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- View More Button -->
+                                        <div class="text-center mt-4">
+                                            <button class="btn btn-outline-primary">Load More Reviews</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Related Products -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="mb-4">Related Products</h3>
+            <div class="row">
+                {% for product in related_products %}
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="card product-card h-100 shadow-sm">
+                        <div class="position-relative">
+                            <img src="https://via.placeholder.com/300" class="card-img-top" alt="{{ product.name }}">
+                            <div class="product-overlay">
+                                <a href="{{ url_for('products.product_detail', product_id=product.id) }}" class="btn btn-sm btn-primary me-2">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                {% if current_user.is_authenticated %}
+                                <button class="btn btn-sm btn-success add-to-cart-btn" data-product-id="{{ product.id }}">
+                                    <i class="fas fa-cart-plus"></i> Add
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-primary">${{ product.price }}</span>
+                                <div class="rating">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Review Modal -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewModalLabel">Write a Review</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="reviewRating" class="form-label">Rating</label>
+                        <div class="rating-select">
+                            <div class="star-rating">
+                                <i class="fas fa-star fa-lg me-1" data-rating="1"></i>
+                                <i class="fas fa-star fa-lg me-1" data-rating="2"></i>
+                                <i class="fas fa-star fa-lg me-1" data-rating="3"></i>
+                                <i class="fas fa-star fa-lg me-1" data-rating="4"></i>
+                                <i class="fas fa-star fa-lg" data-rating="5"></i>
+                            </div>
+                            <input type="hidden" id="reviewRating" name="rating" value="5">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reviewTitle" class="form-label">Review Title</label>
+                        <input type="text" class="form-control" id="reviewTitle" name="title" placeholder="Summarize your experience">
+                    </div>
+                    <div class="mb-3">
+                        <label for="reviewContent" class="form-label">Your Review</label>
+                        <textarea class="form-control" id="reviewContent" name="content" rows="4" placeholder="Tell others about your experience with this product"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Submit Review</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Quantity increment/decrement
+        const quantityInput = document.getElementById('quantity');
+        const decreaseBtn = document.getElementById('decrease-qty');
+        const increaseBtn = document.getElementById('increase-qty');
+        
+        decreaseBtn.addEventListener('click', function() {
+            let value = parseInt(quantityInput.value);
+            if (value > 1) {
+                quantityInput.value = value - 1;
+            }
+        });
+        
+        increaseBtn.addEventListener('click', function() {
+            let value = parseInt(quantityInput.value);
+            let max = parseInt(quantityInput.getAttribute('max'));
+            if (value < max) {
+                quantityInput.value = value + 1;
+            }
+        });
+        
+        // Star rating in review modal
+        const stars = document.querySelectorAll('.star-rating i');
+        const ratingInput = document.getElementById('reviewRating');
+        
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                const rating = this.getAttribute('data-rating');
+                ratingInput.value = rating;
+                
+                // Update visual state of stars
+                stars.forEach(s => {
+                    const sRating = s.getAttribute('data-rating');
+                    if (sRating <= rating) {
+                        s.classList.add('text-warning');
+                    } else {
+                        s.classList.remove('text-warning');
+                    }
+                });
+            });
+        });
+        
+        // Product thumbnail click to change main image
+        const thumbnails = document.querySelectorAll('.product-thumbnail');
+        const mainImage = document.querySelector('.product-image-container img');
+        
+        thumbnails.forEach(thumbnail => {
+            thumbnail.addEventListener('click', function() {
+                const newSrc = this.getAttribute('src');
+                mainImage.setAttribute('src', newSrc);
+                
+                // Add active class to clicked thumbnail
+                thumbnails.forEach(t => t.classList.remove('border-primary'));
+                this.classList.add('border-primary');
+            });
+        });
+        
+        // Add to cart functionality
+        const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+        
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-product-id');
+                
+                // Send AJAX request to add product to cart
+                fetch(`/api/cart/add/${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ quantity: 1 }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        alert(data.message);
+                        
+                        // Update cart count in navbar
+                        const cartBadge = document.querySelector('.fa-shopping-cart').nextElementSibling;
+                        cartBadge.textContent = data.cart_count;
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

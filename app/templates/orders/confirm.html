@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Checkout Progress -->
+    <div class="checkout-progress mb-5">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="progress-step active">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Shopping Cart</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="progress-step active">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Checkout</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="progress-step active">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Order Complete</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <div class="confirmation-icon rounded-circle bg-success d-inline-flex align-items-center justify-content-center mb-4">
+                            <i class="fas fa-check fa-3x text-white"></i>
+                        </div>
+                        <h1 class="mb-3">Thank You For Your Order!</h1>
+                        <p class="text-muted fs-5 mb-4">Your order has been placed and is being processed. You will receive an email confirmation shortly.</p>
+                    </div>
+                    
+                    <div class="order-info border p-4 mb-4 text-start">
+                        <div class="row">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <h5>Order Information</h5>
+                                <p class="mb-1"><strong>Order Number:</strong> #{{ order.id }}</p>
+                                <p class="mb-1"><strong>Date:</strong> {{ order.order_date.strftime('%B %d, %Y') }}</p>
+                                <p class="mb-1"><strong>Total:</strong> ${{ order.total_price }}</p>
+                                <p class="mb-0"><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Shipping Information</h5>
+                                <p class="mb-1">{{ order.shipping_address }}</p>
+                                <p class="mb-1">{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_zip }}</p>
+                                <p class="mb-0">Phone: {{ order.shipping_phone }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h4 class="mb-4 text-start">Order Summary</h4>
+                    
+                    <div class="table-responsive mb-4">
+                        <table class="table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">Product</th>
+                                    <th scope="col" class="text-center">Price</th>
+                                    <th scope="col" class="text-center">Quantity</th>
+                                    <th scope="col" class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://via.placeholder.com/50" alt="{{ item.product_name }}" class="img-fluid rounded me-3" style="width: 50px;">
+                                            <span>{{ item.product_name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">${{ item.price }}</td>
+                                    <td class="text-center">{{ item.quantity }}</td>
+                                    <td class="text-end">${{ item.price * item.quantity }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Subtotal</strong></td>
+                                    <td class="text-end">${{ order.total_price - 10.00 - (order.total_price * 0.08) }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Shipping</strong></td>
+                                    <td class="text-end">$10.00</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Tax (8%)</strong></td>
+                                    <td class="text-end">${{ order.total_price * 0.08 }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Total</strong></td>
+                                    <td class="text-end"><strong>${{ order.total_price }}</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    
+                    <div class="d-flex flex-column flex-md-row gap-3 justify-content-center">
+                        <a href="{{ url_for('orders.order_history') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-list me-2"></i> View Order History
+                        </a>
+                        <a href="{{ url_for('products.list_products') }}" class="btn btn-primary">
+                            <i class="fas fa-shopping-bag me-2"></i> Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

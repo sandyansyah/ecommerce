@@ -1,0 +1,231 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<h1 class="h2 mb-4">Dashboard</h1>
+
+<div class="row">
+    <!-- Overview Statistics -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-3 text-center text-primary">
+                        <i class="fas fa-users fa-3x"></i>
+                    </div>
+                    <div class="col-9">
+                        <h4 class="mb-0">{{ user_count }}</h4>
+                        <p class="text-muted mb-0">Total Users</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-3 text-center text-success">
+                        <i class="fas fa-box fa-3x"></i>
+                    </div>
+                    <div class="col-9">
+                        <h4 class="mb-0">{{ product_count }}</h4>
+                        <p class="text-muted mb-0">Total Products</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-3 text-center text-info">
+                        <i class="fas fa-shopping-cart fa-3x"></i>
+                    </div>
+                    <div class="col-9">
+                        <h4 class="mb-0">{{ order_count }}</h4>
+                        <p class="text-muted mb-0">Total Orders</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-3 text-center text-warning">
+                        <i class="fas fa-dollar-sign fa-3x"></i>
+                    </div>
+                    <div class="col-9">
+                        <h4 class="mb-0">${{ "%.2f"|format(total_sales) }}</h4>
+                        <p class="text-muted mb-0">Total Sales</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- User Role Distribution -->
+    <div class="col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">User Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="userRoleChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Orders -->
+    <div class="col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Orders</h5>
+                <a href="{{ url_for('admin.order_list') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Order #</th>
+                                <th scope="col">Customer</th>
+                                <th scope="col">Date</th>
+                                <th scope="col">Total</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if recent_orders %}
+                                {% for order in recent_orders %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('admin.order_detail', order_id=order.id) }}" class="text-decoration-none">#{{ order.id }}</a>
+                                    </td>
+                                    <td>{{ order.customer.username }}</td>
+                                    <td>{{ order.order_date.strftime('%b %d, %Y') }}</td>
+                                    <td>${{ "%.2f"|format(order.total_price) }}</td>
+                                    <td>
+                                        {% if order.status == 'pending' %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                        {% elif order.status == 'paid' %}
+                                        <span class="badge bg-success">Paid</span>
+                                        {% elif order.status == 'shipped' %}
+                                        <span class="badge bg-info">Shipped</span>
+                                        {% elif order.status == 'delivered' %}
+                                        <span class="badge bg-primary">Delivered</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ order.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-3">No orders found</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Quick Access -->
+    <div class="col-12 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3 col-6 mb-3">
+                        <a href="{{ url_for('admin.user_list') }}" class="text-decoration-none">
+                            <div class="quick-action bg-light p-4 rounded">
+                                <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
+                                <h5>Manage Users</h5>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <a href="{{ url_for('admin.product_list') }}" class="text-decoration-none">
+                            <div class="quick-action bg-light p-4 rounded">
+                                <i class="fas fa-box-open fa-3x text-success mb-3"></i>
+                                <h5>Manage Products</h5>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <a href="{{ url_for('admin.order_list') }}" class="text-decoration-none">
+                            <div class="quick-action bg-light p-4 rounded">
+                                <i class="fas fa-clipboard-list fa-3x text-info mb-3"></i>
+                                <h5>Manage Orders</h5>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <a href="{{ url_for('admin.category_list') }}" class="text-decoration-none">
+                            <div class="quick-action bg-light p-4 rounded">
+                                <i class="fas fa-tags fa-3x text-warning mb-3"></i>
+                                <h5>Manage Categories</h5>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // User Role Distribution Chart
+        const userRoleCtx = document.getElementById('userRoleChart').getContext('2d');
+        const userRoleChart = new Chart(userRoleCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Customers', 'Sellers', 'Admins'],
+                datasets: [{
+                    data: [{{ customer_count }}, {{ seller_count }}, {{ admin_count }}],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 159, 64, 0.7)',
+                        'rgba(255, 99, 132, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    title: {
+                        display: true,
+                        text: 'User Role Distribution'
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

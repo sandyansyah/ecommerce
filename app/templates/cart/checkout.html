@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Checkout</h1>
+    
+    <!-- Checkout Progress -->
+    <div class="checkout-progress mb-5">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="progress-step active">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Shopping Cart</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="progress-step active">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Checkout</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="progress-step">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Order Complete</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <form action="{{ url_for('orders.place_order') }}" method="post">
+        <div class="row">
+            <!-- Checkout Form -->
+            <div class="col-lg-8 mb-4 mb-lg-0">
+                <!-- Shipping Information -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">Shipping Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="use_profile_address" name="use_profile_address" {% if user.address %}checked{% endif %}>
+                            <label class="form-check-label" for="use_profile_address">Use my profile address</label>
+                        </div>
+                        
+                        <div id="shipping_address_form" {% if user.address %}style="display: none;"{% endif %}>
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <label for="shipping_address" class="form-label">Address</label>
+                                    <input type="text" class="form-control" id="shipping_address" name="shipping_address" value="{{ user.address }}" placeholder="Street address">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="shipping_city" class="form-label">City</label>
+                                    <input type="text" class="form-control" id="shipping_city" name="shipping_city" value="{{ user.city }}" placeholder="City">
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-4 mb-3 mb-md-0">
+                                    <label for="shipping_state" class="form-label">State</label>
+                                    <input type="text" class="form-control" id="shipping_state" name="shipping_state" value="{{ user.state }}" placeholder="State">
+                                </div>
+                                <div class="col-md-4 mb-3 mb-md-0">
+                                    <label for="shipping_zip" class="form-label">ZIP Code</label>
+                                    <input type="text" class="form-control" id="shipping_zip" name="shipping_zip" value="{{ user.zip_code }}" placeholder="ZIP Code">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="shipping_phone" class="form-label">Phone</label>
+                                    <input type="text" class="form-control" id="shipping_phone" name="shipping_phone" value="{{ user.phone }}" placeholder="Phone number">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payment Method -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">Payment Method</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="payment-methods">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="payment_method" id="credit_card" value="credit_card" checked>
+                                <label class="form-check-label d-flex align-items-center" for="credit_card">
+                                    <i class="far fa-credit-card fa-2x me-3 text-primary"></i>
+                                    <span>Credit Card</span>
+                                </label>
+                            </div>
+                            
+                            <div id="credit_card_form" class="payment-form mb-4">
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <label for="card_number" class="form-label">Card Number</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="card_number" placeholder="1234 5678 9012 3456">
+                                            <span class="input-group-text bg-white">
+                                                <i class="fab fa-cc-visa text-primary me-2"></i>
+                                                <i class="fab fa-cc-mastercard text-danger me-2"></i>
+                                                <i class="fab fa-cc-amex text-info"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6 mb-3 mb-md-0">
+                                        <label for="expiry_date" class="form-label">Expiry Date</label>
+                                        <input type="text" class="form-control" id="expiry_date" placeholder="MM/YY">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="cvv" class="form-label">CVV</label>
+                                        <input type="text" class="form-control" id="cvv" placeholder="123">
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label for="card_name" class="form-label">Name on Card</label>
+                                        <input type="text" class="form-control" id="card_name" placeholder="John Doe">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="payment_method" id="paypal" value="paypal">
+                                <label class="form-check-label d-flex align-items-center" for="paypal">
+                                    <i class="fab fa-paypal fa-2x me-3 text-primary"></i>
+                                    <span>PayPal</span>
+                                </label>
+                            </div>
+                            
+                            <div id="paypal_form" class="payment-form mb-4" style="display: none;">
+                                <p class="text-muted">You will be redirected to PayPal to complete your payment securely.</p>
+                            </div>
+                            
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="cash_on_delivery" value="cash_on_delivery">
+                                <label class="form-check-label d-flex align-items-center" for="cash_on_delivery">
+                                    <i class="fas fa-money-bill-wave fa-2x me-3 text-success"></i>
+                                    <span>Cash on Delivery</span>
+                                </label>
+                            </div>
+                            
+                            <div id="cash_on_delivery_form" class="payment-form mt-3" style="display: none;">
+                                <p class="text-muted">Pay with cash upon delivery. Please have the exact amount ready.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Notes -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">Additional Notes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="order_notes" class="form-label">Order Notes (Optional)</label>
+                            <textarea class="form-control" id="order_notes" name="order_notes" rows="3" placeholder="Special instructions for delivery or any other notes"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Summary -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="order-summary">
+                            {% for item in cart_items %}
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="badge bg-primary rounded-circle me-2">{{ item.quantity }}</div>
+                                    <span>{{ item.product.name }}</span>
+                                </div>
+                                <span class="fw-bold">${{ item.quantity * item.product.price }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Subtotal</span>
+                            <span class="fw-bold">${{ subtotal }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Shipping</span>
+                            <span class="fw-bold">${{ shipping }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Tax (8%)</span>
+                            <span class="fw-bold">${{ tax }}</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="fw-bold">Total</span>
+                            <span class="fw-bold text-primary fs-5">${{ total }}</span>
+                        </div>
+                        
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="terms_agree" name="terms_agree" required>
+                            <label class="form-check-label" for="terms_agree">
+                                I agree to the <a href="#" class="text-decoration-none">Terms and Conditions</a> and <a href="#" class="text-decoration-none">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-lock me-2"></i> Place Order
+                            </button>
+                            <a href="{{ url_for('cart.view_cart') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Cart
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle shipping address form
+        const useProfileAddressCheckbox = document.getElementById('use_profile_address');
+        const shippingAddressForm = document.getElementById('shipping_address_form');
+        
+        useProfileAddressCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                shippingAddressForm.style.display = 'none';
+            } else {
+                shippingAddressForm.style.display = 'block';
+            }
+        });
+        
+        // Toggle payment method forms
+        const paymentMethodRadios = document.querySelectorAll('input[name="payment_method"]');
+        const creditCardForm = document.getElementById('credit_card_form');
+        const paypalForm = document.getElementById('paypal_form');
+        const cashOnDeliveryForm = document.getElementById('cash_on_delivery_form');
+        
+        paymentMethodRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Hide all payment forms
+                creditCardForm.style.display = 'none';
+                paypalForm.style.display = 'none';
+                cashOnDeliveryForm.style.display = 'none';
+                
+                // Show selected payment form
+                if (this.value === 'credit_card') {
+                    creditCardForm.style.display = 'block';
+                } else if (this.value === 'paypal') {
+                    paypalForm.style.display = 'block';
+                } else if (this.value === 'cash_on_delivery') {
+                    cashOnDeliveryForm.style.display = 'block';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

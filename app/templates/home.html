@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h1 class="display-4 fw-bold mb-4">Welcome to ShopEasy</h1>
+                <p class="lead mb-4">Discover amazing products at unbeatable prices. Shop with confidence and enjoy fast delivery.</p>
+                <div class="d-grid gap-2 d-md-flex">
+                    <a href="{{ url_for('products.list_products') }}" class="btn btn-light btn-lg px-4 me-md-2">
+                        Shop Now <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                    <a href="#featured-products" class="btn btn-outline-light btn-lg px-4">
+                        Featured Products
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img src="https://via.placeholder.com/600x400" alt="ShopEasy" class="img-fluid rounded shadow">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Shop by Category</h2>
+        <div class="row">
+            {% for category in categories %}
+            <div class="col-6 col-md-3 mb-4">
+                <a href="{{ url_for('products.category', category_id=category.id) }}" class="text-decoration-none">
+                    <div class="card category-card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center py-4">
+                            <i class="fas fa-{% if category.name == 'Electronics' %}laptop{% elif category.name == 'Clothing' %}tshirt{% elif category.name == 'Home & Kitchen' %}home{% elif category.name == 'Books' %}book{% else %}shopping-bag{% endif %} fa-3x mb-3 text-primary"></i>
+                            <h5 class="card-title">{{ category.name }}</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products Section -->
+<section id="featured-products" class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Featured Products</h2>
+            <a href="{{ url_for('products.list_products') }}" class="btn btn-outline-primary">
+                View All <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+        
+        <div class="row">
+            {% for product in featured_products %}
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card product-card h-100 shadow-sm">
+                    <div class="position-relative">
+                        <img src="https://via.placeholder.com/300" class="card-img-top" alt="{{ product.name }}">
+                        <div class="product-overlay">
+                            <a href="{{ url_for('products.product_detail', product_id=product.id) }}" class="btn btn-sm btn-primary me-2">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            {% if current_user.is_authenticated %}
+                            <button class="btn btn-sm btn-success add-to-cart-btn" data-product-id="{{ product.id }}">
+                                <i class="fas fa-cart-plus"></i> Add
+                            </button>
+                            {% endif %}
+                        </div>
+                        {% if product.is_featured %}
+                        <span class="badge bg-danger position-absolute top-0 start-0 m-2">Featured</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-primary">${{ product.price }}</span>
+                            <div class="rating">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star-half-alt text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Promotional Banners -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="promo-banner bg-primary text-white p-4 rounded shadow">
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h3>Summer Sale</h3>
+                            <p class="mb-0">Up to 50% off on selected items</p>
+                        </div>
+                        <div class="col-4 text-end">
+                            <a href="#" class="btn btn-light">Shop Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="promo-banner bg-success text-white p-4 rounded shadow">
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h3>Free Shipping</h3>
+                            <p class="mb-0">On orders over $50</p>
+                        </div>
+                        <div class="col-4 text-end">
+                            <a href="#" class="btn btn-light">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">What Our Customers Say</h2>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-quote-left fa-2x text-primary opacity-50"></i>
+                        </div>
+                        <p class="card-text">ShopEasy has the best selection of products at amazing prices. The delivery was super fast and the quality is excellent!</p>
+                        <div class="d-flex justify-content-center mb-2">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <h5 class="card-title mb-1">Sarah Johnson</h5>
+                        <p class="text-muted small">Loyal Customer</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-quote-left fa-2x text-primary opacity-50"></i>
+                        </div>
+                        <p class="card-text">I've been shopping with ShopEasy for years now. Their customer service is exceptional and the products never disappoint.</p>
+                        <div class="d-flex justify-content-center mb-2">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <h5 class="card-title mb-1">Michael Thompson</h5>
+                        <p class="text-muted small">Regular Shopper</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-quote-left fa-2x text-primary opacity-50"></i>
+                        </div>
+                        <p class="card-text">The checkout process is so smooth and easy. I love how quickly my orders arrive. Will definitely shop here again!</p>
+                        <div class="d-flex justify-content-center mb-2">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star-half-alt text-warning"></i>
+                        </div>
+                        <h5 class="card-title mb-1">Emily Rodriguez</h5>
+                        <p class="text-muted small">New Customer</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="mb-4">Subscribe to Our Newsletter</h2>
+                <p class="mb-4">Stay updated with our latest products and exclusive offers.</p>
+                <form class="row g-3 justify-content-center">
+                    <div class="col-md-8">
+                        <input type="email" class="form-control form-control-lg" placeholder="Your email address">
+                    </div>
+                    <div class="col-md-auto">
+                        <button type="submit" class="btn btn-light btn-lg px-4">Subscribe</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add to cart functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+        
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-product-id');
+                
+                // Send AJAX request to add product to cart
+                fetch(`/api/cart/add/${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ quantity: 1 }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        alert(data.message);
+                        
+                        // Update cart count in navbar
+                        const cartBadge = document.querySelector('.fa-shopping-cart').nextElementSibling;
+                        cartBadge.textContent = data.cart_count;
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}
