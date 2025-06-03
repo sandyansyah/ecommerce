@@ -5,3 +5,4 @@ Flask-WTF==1.2.1
 email-validator==2.0.0
 Werkzeug==2.3.7
 itsdangerous==2.1.2
+pip install Pillow
